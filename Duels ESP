@@ -1,5 +1,5 @@
 local Workspace, RunService, Players, CoreGui, Lighting = cloneref(game:GetService("Workspace")), cloneref(game:GetService("RunService")), cloneref(game:GetService("Players")), game:GetService("CoreGui"), cloneref(game:GetService("Lighting"))
---NEW
+--i
 local ESP = {
     Enabled = false,
     TeamCheck = false,
@@ -20,7 +20,7 @@ local ESP = {
             Enabled  = false,
             Thermal = false,
             FillRGB = Color3.fromRGB(119, 120, 255),
-            Fill_Transparency = 50,
+            Fill_Transparency = 0.5,
             OutlineRGB = Color3.fromRGB(255, 255, 255),
             Outline_Transparency = 0,
             VisibleCheck = false,
@@ -244,10 +244,17 @@ local ApplyESP = function(plr)
             Chams.Enabled = ESP.Drawing.Chams.Enabled
             Chams.FillColor = ESP.Drawing.Chams.FillRGB
             Chams.OutlineColor = ESP.Drawing.Chams.OutlineRGB
+            
+            local baseFill = (ESP.Drawing.Chams.Fill_Transparency > 1) and (ESP.Drawing.Chams.Fill_Transparency / 100) or ESP.Drawing.Chams.Fill_Transparency
+            local baseOutline = (ESP.Drawing.Chams.Outline_Transparency > 1) and (ESP.Drawing.Chams.Outline_Transparency / 100) or ESP.Drawing.Chams.Outline_Transparency
+            
+            Chams.FillTransparency = baseFill
+            Chams.OutlineTransparency = baseOutline
+
             if ESP.Drawing.Chams.Thermal then
                 local breathe_effect = math.atan(math.sin(tick() * 2)) * 2 / math.pi
-                Chams.FillTransparency = ESP.Drawing.Chams.Fill_Transparency * breathe_effect * 0.01
-                Chams.OutlineTransparency = ESP.Drawing.Chams.Outline_Transparency * breathe_effect * 0.01
+                Chams.FillTransparency = math.clamp(baseFill * breathe_effect, 0, 1)
+                Chams.OutlineTransparency = math.clamp(baseOutline * breathe_effect, 0, 1)
             end
             Chams.DepthMode = ESP.Drawing.Chams.VisibleCheck and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop
 
