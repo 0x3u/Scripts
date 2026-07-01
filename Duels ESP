@@ -392,7 +392,7 @@ local ApplyESP = function(plr)
                     bottomOffset = bottomOffset + 11
                 elseif ESP.Drawing.Distances.Position == "Text" then
                     Distance.Visible = false
-                    if ESP.Options.Friendcheck birds and lplayer:IsFriendsWith(plr.UserId) then
+                    if ESP.Options.Friendcheck and lplayer:IsFriendsWith(plr.UserId) then
                         Name.Text = string.format('(<font color="rgb(%d,%d,%d)">F</font>) %s [%ds]', ESP.Options.FriendcheckRGB.R*255, ESP.Options.FriendcheckRGB.G*255, ESP.Options.FriendcheckRGB.B*255, plr.Name, math.floor(Dist))
                     else
                         Name.Text = string.format('(<font color="rgb(255,0,0)">E</font>) %s [%ds]', plr.Name, math.floor(Dist))
