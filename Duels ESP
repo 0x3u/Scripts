@@ -2,7 +2,7 @@ local Workspace, RunService, Players, CoreGui, Lighting = cloneref(game:GetServi
 
 local ESP = {
     Enabled = false,
-    TeamCheck = true,
+    TeamCheck = false,
     MaxDistance = 2000,
     FontSize = 13,
     FadeOut = {
@@ -161,6 +161,7 @@ local ApplyESP = function(plr)
         skeletonLines[i] = line
     end
 
+    local DisplayedHealth = 1
     local Connection
     local function HideESP()
         Container.Visible = false
@@ -341,21 +342,32 @@ local ApplyESP = function(plr)
             Gradient2.Rotation = ESP.Drawing.Boxes.Animate and RotationAngle or -45
             Tick = tick()
 
-            local health = math.clamp(Humanoid.Health / Humanoid.MaxHealth, 0, 1)
+            local actualHealth = math.clamp(Humanoid.Health / Humanoid.MaxHealth, 0, 1)
+            DisplayedHealth = DisplayedHealth + (actualHealth - DisplayedHealth) * 0.15
+
             Healthbar.Visible = ESP.Drawing.Healthbar.Enabled
-            Healthbar.Position = UDim2.new(0, x - 6, 0, y + h * (1 - health))
-            Healthbar.Size = UDim2.new(0, ESP.Drawing.Healthbar.Width, 0, h * health)
+            Healthbar.Position = UDim2.new(0, x - 6, 0, y + h * (1 - DisplayedHealth))
+            Healthbar.Size = UDim2.new(0, ESP.Drawing.Healthbar.Width, 0, h * DisplayedHealth)
 
             BehindHealthbar.Visible = ESP.Drawing.Healthbar.Enabled
             BehindHealthbar.Position = UDim2.new(0, x - 6, 0, y)
             BehindHealthbar.Size = UDim2.new(0, ESP.Drawing.Healthbar.Width, 0, h)
 
-            if ESP.Drawing.Healthbar.HealthText and health < 1 then
-                HealthText.Position = UDim2.new(0, x - 16, 0, y + h * (1 - health))
-                HealthText.Text = tostring(math.floor(health * 100))
+            HealthbarGradient.Enabled = ESP.Drawing.Healthbar.Gradient
+            if ESP.Drawing.Healthbar.Gradient then
+                HealthbarGradient.Color = ColorSequence.new{
+                    ColorSequenceKeypoint.new(0, ESP.Drawing.Healthbar.GradientRGB1),
+                    ColorSequenceKeypoint.new(0.5, ESP.Drawing.Healthbar.GradientRGB2),
+                    ColorSequenceKeypoint.new(1, ESP.Drawing.Healthbar.GradientRGB3)
+                }
+            end
+
+            if ESP.Drawing.Healthbar.HealthText and actualHealth < 1 then
+                HealthText.Position = UDim2.new(0, x - 16, 0, y + h * (1 - DisplayedHealth))
+                HealthText.Text = tostring(math.floor(actualHealth * 100))
                 HealthText.Visible = true
                 if ESP.Drawing.Healthbar.Lerp then
-                    HealthText.TextColor3 = Color3.fromHSV(health * 0.33, 1, 1)
+                    HealthText.TextColor3 = Color3.fromHSV(DisplayedHealth * 0.33, 1, 1)
                 else
                     HealthText.TextColor3 = ESP.Drawing.Healthbar.HealthTextRGB
                 end
@@ -380,7 +392,7 @@ local ApplyESP = function(plr)
                     bottomOffset = bottomOffset + 11
                 elseif ESP.Drawing.Distances.Position == "Text" then
                     Distance.Visible = false
-                    if ESP.Options.Friendcheck and lplayer:IsFriendsWith(plr.UserId) then
+                    if ESP.Options.Friendcheck birds and lplayer:IsFriendsWith(plr.UserId) then
                         Name.Text = string.format('(<font color="rgb(%d,%d,%d)">F</font>) %s [%ds]', ESP.Options.FriendcheckRGB.R*255, ESP.Options.FriendcheckRGB.G*255, ESP.Options.FriendcheckRGB.B*255, plr.Name, math.floor(Dist))
                     else
                         Name.Text = string.format('(<font color="rgb(255,0,0)">E</font>) %s [%ds]', plr.Name, math.floor(Dist))
